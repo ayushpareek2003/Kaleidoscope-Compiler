@@ -46,10 +46,8 @@ std::unique_ptr<ExprAST> ParseParenExpr() {
 std::unique_ptr<ExprAST> ParseIdentifierExpr() {
     std::string IdName = IdentifierStr;
     getNextToken();
-
     if (CurTok != '(')
         return std::make_unique<VariableExprAST>(IdName);
-
     getNextToken();
     std::vector<std::unique_ptr<ExprAST>> Args;
     if (CurTok != ')') {
@@ -85,7 +83,6 @@ std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec, std::unique_ptr<ExprAST> LH
 
         auto RHS = ParsePrimary();
         if (!RHS) return nullptr;
-
         int NextPrec = GetTokPrecedence();
         if (TokPrec < NextPrec) {
             RHS = ParseBinOpRHS(TokPrec + 1, std::move(RHS));

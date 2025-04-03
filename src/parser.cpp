@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "./inc/ast.h"
 
 int CurTok;
 int getNextToken() { return CurTok = gettok(); }
@@ -106,4 +107,9 @@ std::unique_ptr<PrototypeAST> ParsePrototype() {
     if (CurTok != ')') return LogErrorP("Expected ')' in prototype");
     getNextToken();
     return std::make_unique<PrototypeAST>(FnName, std::move(ArgNames));
+}
+
+static std::unique_ptr<PrototypeAST> ParseExtern() {
+    getNextToken(); // eat extern.
+    return ParsePrototype();
 }

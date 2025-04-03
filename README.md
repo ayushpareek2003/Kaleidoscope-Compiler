@@ -3,8 +3,6 @@ First you have to compile the kaleidoscope compiler itself. Create a directory o
 
 ```c++
 cmake ~/path/to/kaleidoscope/gitrepo && make
-Usage
-The kaleidoscope binary is located in the src folder. Currently kaleidoscope only parses the input and shows which expression was parsed.
 ```
 
 $ ./kaleidoscope

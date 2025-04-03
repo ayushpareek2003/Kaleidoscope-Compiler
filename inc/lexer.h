@@ -1,33 +1,38 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include <cctype>
-#include <cstdio>
-#include <cstdlib>
+#include <iostream>
 #include <string>
 
+// The lexer returns tokens [0-255] if it is an unknown character, otherwise one
+// of these for known things.
 enum Token {
-    tok_eof = -1,
-  
-    
-    tok_def = -2,
-    tok_extern = -3,
+    TokenEOF = -1,
 
-    tok_identifier = -4,
-    tok_number = -5,
-  
- 
-    tok_if = -6,
-    tok_then = -7,
-    tok_else = -8,
-    tok_for = -9,
-    tok_in = -10
-  };
-  
+    // commands
+            TokenDef = -2, TokenExtern = -3,
 
-extern std::string IdentifierStr;
-extern double NumVal;
+    // primary
+            TokenIdentifier = -4, TokenNumber = -5,
+};
 
-int gettok();
+class Lexer {
+    std::istream* inputStream;
+    int lastChar = ' ';
+
+protected:
+    std::string identifier; // Filled in if TokenIdentifier
+    double numberValue;     // Filled in if TokenNumber
+
+public:
+    Lexer() { }
+
+    Lexer(std::istream* inputStream) :
+            inputStream(inputStream) { }
+
+    virtual int const getToken();
+    std::string getIdentifier();
+    double getNumberValue();
+};
 
 #endif

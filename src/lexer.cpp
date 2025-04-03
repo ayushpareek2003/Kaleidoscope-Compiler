@@ -1,46 +1,55 @@
-#include "lexer.h"
 
-std::string IdentifierStr;
-double NumVal;
+#include "./inc/lexer.h"
 
-int gettok() {
-    static int LastChar = ' ';
+int const Lexer::getToken() {
+    // Skip any whitespace.
+    while (isspace(lastChar))
+        lastChar = (int) inputStream->get();
 
-    while (isspace(LastChar))
-        LastChar = getchar();
+    if (isalpha(lastChar)) { // identifier: [a-zA-Z][a-zA-Z0-9]*
+        identifier = lastChar;
+        while (isalnum((lastChar = (int) inputStream->get())))
+            identifier += lastChar;
 
-    if (isalpha(LastChar)) {
-        IdentifierStr = LastChar;
-        while (isalnum((LastChar = getchar())))
-            IdentifierStr += LastChar;
-
-        if (IdentifierStr == "def") return tok_def;
-        if (IdentifierStr == "extern") return tok_extern;
-        return tok_identifier;
+        if (identifier == "def") return TokenDef;
+        if (identifier == "extern") return TokenExtern;
+        return TokenIdentifier;
     }
 
-    if (isdigit(LastChar) || LastChar == '.') {
-        std::string NumStr;
+    if (isdigit(lastChar) || lastChar == '.') {   // Number: [0-9.]+
+        std::string number;
         do {
-            NumStr += LastChar;
-            LastChar = getchar();
-        } while (isdigit(LastChar) || LastChar == '.');
+            number += lastChar;
+            lastChar = (int) inputStream->get();
+        } while (isdigit(lastChar) || lastChar == '.');
 
-        NumVal = strtod(NumStr.c_str(), nullptr);
-        return tok_number;
+        numberValue = strtod(number.c_str(), 0);
+        return TokenNumber;
     }
 
-    if (LastChar == '#') {
-        do LastChar = getchar();
-        while (LastChar != EOF && LastChar != '\n' && LastChar != '\r');
+    if (lastChar == '#') {
+        // Comment until end of line.
+        do lastChar = (int) inputStream->get();
+        while (lastChar != EOF && lastChar != '\n' && lastChar != '\r');
 
-        if (LastChar != EOF) return gettok();
+        if (lastChar != EOF)
+            return getToken();
     }
 
-    if (LastChar == EOF)
-        return tok_eof;
+    // Check for end of file.  Don't eat the EOF.
+    if (lastChar == EOF)
+        return TokenEOF;
 
-    int ThisChar = LastChar;
-    LastChar = getchar();
-    return ThisChar;
+    // Otherwise, just return the character as its ascii value.
+    int thisChar = lastChar;
+    lastChar = (int) inputStream->get();
+    return thisChar;
+}
+
+std::string Lexer::getIdentifier() {
+    return identifier;
+}
+
+double Lexer::getNumberValue() {
+    return numberValue;
 }
